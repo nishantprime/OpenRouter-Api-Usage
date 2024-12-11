@@ -26,7 +26,7 @@ def generation(prompt):
             "role": "user",
             "content": prompt
           }]}))
-    result = json.loads(response)
+    result = json.loads(response.text)
     output = result['choices'][0]
     
     collection.insert_one({
