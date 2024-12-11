@@ -108,22 +108,22 @@
         {% endif %}
 
         {% for message in chat %}
-        <div class="message {{ 'user' if message.response == '' else 'bot' }}">
+        <div class="message user" {% if message.prompt %} {% else %} hidden {% endif %}>
             <div class="bubble">
-                {{ message.prompt if message.response == '' else message.response }}
+                {{ message.prompt }}
                 <span class="time">{{ message.formatted_time }}</span>
             </div>
         </div>
-        {% endfor %}
 
-        {% if response %}
-        <div class="message bot">
+        <div class="message bot" {% if message.response %} {% else %} hidden {% endif %}>
             <div class="bubble">
-                {{ response }}
-                <span class="time">{{ time }} | Tokens: {{ token_usage }}</span>
+                {{ message.response }}
+                <span class="time">{{ message.formatted_time }}
+                    {% if message.tokens %}| Tokens: {{ message.tokens }} {% endif %}
+                </span>
             </div>
         </div>
-        {% endif %}
+        {% endfor %}
     </div>
 
     <div class="footer">
@@ -149,7 +149,11 @@
         }
 
         function refreshPage() {
-            window.location.reload();
+            fetch('/')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('chat-container').innerHTML = html;
+                });
         }
     </script>
 </body>
