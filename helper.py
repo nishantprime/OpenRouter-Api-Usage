@@ -41,7 +41,7 @@ def generation(prompt):
       'tokens': str(result['usage'])
     })
 
-    user_output = [format_time(result['created']), output['message']['content'], str(result['usage']]
+    user_output = [format_time(result['created']), output['message']['content'], str(result['usage'])]
     return user_output
   except Exception as e:
     return [None,str(e),None]
