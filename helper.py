@@ -48,7 +48,7 @@ def generation(prompt):
 
 def get_messages():
   chat = list(collection.find({}, {'prompt': 1, 'response': 1, 'formatted_time': 1, 'tokens': 1}).sort('created',-1).limit(20))
-  chat = chat.reverse()
+  chat.reverse()
   return chat
 
 
