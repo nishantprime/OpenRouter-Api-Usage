@@ -93,90 +93,64 @@
         .footer button:hover {
             background-color: #0056b3;
         }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <div class="chat-container" id="chat-container">
-        <!-- Messages will be dynamically injected here -->
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% for message in chat %}
+        <div class="message {{ 'user' if message.response == '' else 'bot' }}">
+            <div class="bubble">
+                {{ message.prompt if message.response == '' else message.response }}
+                <span class="time">{{ message.formatted_time }}</span>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if response %}
+        <div class="message bot">
+            <div class="bubble">
+                {{ response }}
+                <span class="time">{{ time }} | Tokens: {{ token_usage }}</span>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <div class="footer">
-        <input type="text" id="prompt" placeholder="Type your message here...">
+        <input type="text" id="prompt" name="prompt" placeholder="Type your message here...">
         <button onclick="sendMessage()">Send</button>
-        <button onclick="refreshMessages()">Refresh</button>
+        <button onclick="refreshPage()">Refresh</button>
     </div>
 
     <script>
-        async function sendMessage() {
-            const prompt = document.getElementById('prompt').value;
-            if (!prompt) return;
+        function sendMessage() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/';
 
-            // Clear input box
-            document.getElementById('prompt').value = '';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'prompt';
+            input.value = document.getElementById('prompt').value;
 
-            // Display user's message instantly
-            addMessage(prompt, 'user', new Date().toLocaleString(), null);
-
-            try {
-                const response = await fetch('/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({ prompt })
-                });
-
-                const data = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(data, 'text/html');
-
-                const responseText = doc.querySelector('[name="response"]').getAttribute('content');
-                const time = doc.querySelector('[name="time"]').getAttribute('content');
-                const tokenUsage = doc.querySelector('[name="token_usage"]').getAttribute('content');
-
-                addMessage(responseText, 'bot', time, tokenUsage);
-            } catch (error) {
-                console.error(error);
-                addMessage('Error: Unable to fetch response.', 'bot', new Date().toLocaleString(), null);
-            }
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
         }
 
-        function refreshMessages() {
-            fetch('/')
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const messages = doc.querySelectorAll('.message');
-                    const chatContainer = document.getElementById('chat-container');
-                    chatContainer.innerHTML = '';
-
-                    messages.forEach(msg => {
-                        chatContainer.appendChild(msg);
-                    });
-                })
-                .catch(error => console.error(error));
+        function refreshPage() {
+            window.location.reload();
         }
-
-        function addMessage(content, sender, time, tokenUsage) {
-            const chatContainer = document.getElementById('chat-container');
-
-            const message = document.createElement('div');
-            message.className = `message ${sender}`;
-
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.innerHTML = `${content}<span class="time">${time}${tokenUsage ? ' | Tokens: ' + tokenUsage : ''}</span>`;
-
-            message.appendChild(bubble);
-            chatContainer.appendChild(message);
-
-            // Scroll to the bottom
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // Initial load of chat messages (GET request)
-        refreshMessages();
     </script>
 </body>
 </html>
