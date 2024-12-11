@@ -133,28 +133,40 @@
     </div>
 
     <script>
+        // Scroll to the bottom of the chat container
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    
+        // Trigger the scroll to bottom on page load
+        window.onload = scrollToBottom;
+    
         function sendMessage() {
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/';
-
+    
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'prompt';
             input.value = document.getElementById('prompt').value;
-
+    
             form.appendChild(input);
             document.body.appendChild(form);
             form.submit();
         }
-
+    
         function refreshPage() {
             fetch('/')
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('chat-container').innerHTML = html;
+                    scrollToBottom(); // Ensure scroll is maintained after refresh
                 });
         }
     </script>
+
+    
 </body>
 </html>
