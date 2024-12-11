@@ -129,7 +129,6 @@
     <div class="footer">
         <input type="text" id="prompt" name="prompt" placeholder="Type your message here...">
         <button onclick="sendMessage()">Send</button>
-        <button onclick="refreshPage()">Refresh</button>
     </div>
 
     <script>
@@ -157,14 +156,6 @@
             form.submit();
         }
     
-        function refreshPage() {
-            fetch('/')
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('chat-container').innerHTML = html;
-                    scrollToBottom(); // Ensure scroll is maintained after refresh
-                });
-        }
     </script>
 
     
