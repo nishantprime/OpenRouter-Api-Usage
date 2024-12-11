@@ -1,5 +1,5 @@
 import os
-from mongodb import MongoClient
+from pymongo import MongoClient
 
 mongo_key = os.getenv('mongo_key')
 client = MongoClient(mongo_key)
