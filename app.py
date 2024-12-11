@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route('/', methods = ['GET', 'POST'])
 def chat():
   if request.method == 'GET':
-    chat = collection.find({},{'prompt':1, 'response':1, 'formatted_time':1})
+    chat = list(collection.find({},{'prompt':1, 'response':1, 'formatted_time':1}))
     return render_template('index.html', chat=chat)
   else:
     prompt = request.form['prompt']
